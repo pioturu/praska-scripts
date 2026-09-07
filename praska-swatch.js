@@ -277,7 +277,7 @@
         row.appendChild(item);
       });
       wrap.appendChild(row);
-      addCatalogLink(wrap, 'https://catalogues.praska.shop/plywood-colours', 'showPlywoodCatalog');
+      addCatalogLink(wrap, 'https://catalogues.praska.shop/9498a23bcd.html', 'showPlywoodCatalog');
       root.appendChild(wrap);
       if (isRequired([g])){
         requiredChecks.push({ label: g.label, isSatisfied: (function(entry){ return function(){ return entryHasValue(entry); }; })(g), scrollTarget: wrap });
@@ -343,7 +343,7 @@
       }
     }
 
-    renderTabbedSection(groups.material, 'Materiał', 'https://catalogues.praska.shop/collections-fabrics');
+    renderTabbedSection(groups.material, 'Materiał', 'https://catalogues.praska.shop/96d6646d5f.html');
     renderTabbedSection(groups.fur, 'Futro');
 
     var allEntries = groups.material.concat(groups.fur, groups.plywood, groups.side, groups.size);

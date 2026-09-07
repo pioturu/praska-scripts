@@ -18,6 +18,12 @@
 
   var ASSET_BASE = 'https://praska.shop/userdata/public/assets/warianty/';
 
+  // Kolejność prób rozszerzeń pliku obrazka — Peter potwierdził, że
+  // ma mieszankę .jpg i .jpeg w folderze assetów. Próbujemy .jpg
+  // pierwsze (większość plików), potem .jpeg, zanim uznamy zdjęcie
+  // za brakujące.
+  var IMG_EXTENSIONS = ['jpg', 'jpeg'];
+
   // ============================================================
   // MAPA option-id -> rola pola.
   //
@@ -31,8 +37,7 @@
   // STRIPES) potwierdzone z osobnych zrzutów wartości opcji — dwa
   // niezależne pola futra, każde z własną paletą kolorów. Celowo BEZ
   // klucza "family" — Peter wybrał, żeby zakładka/nagłówek pokazywał
-  // surową przetłumaczoną etykietę pola (np. "FUR COLOR" / "KOLOR
-  // FUTRA"), a nie jedno stałe uniwersalne słowo.
+  // surową przetłumaczoną etykietę pola, a nie jedno stałe słowo.
   //
   // NIE zmapowane celowo — brak istniejącej "role" dla nich, czekają
   // na decyzję/próbkę:
@@ -90,13 +95,12 @@
       .replace(/\s+/g,'-').trim();
   }
 
-  // Sklejka ma podfolder, wszystko inne (materiał, futro po zamianie
-  // na nazwę kanoniczną) trafia bezpośrednio do ASSET_BASE. Futro nie
-  // ma już osobnej gałęzi z encodeURIComponent — to była niezgodność
-  // z realną konwencją nazw plików (spacje -> "-", nie %20).
-  function imgFor(role, value){
-    if (role === 'plywood') return ASSET_BASE + 'sklejka/' + slug(value) + '.jpg';
-    return ASSET_BASE + slug(value) + '.jpg';
+  // Zwraca URL BEZ rozszerzenia — próby .jpg/.jpeg dzieją się w
+  // makeSwatchItem(), bo to tam wiemy, które rozszerzenie faktycznie
+  // zadziałało (potrzebne też do podglądu na hover).
+  function imgBaseFor(role, value){
+    if (role === 'plywood') return ASSET_BASE + 'sklejka/' + slug(value);
+    return ASSET_BASE + slug(value);
   }
 
   function combineLabel(family, text){
@@ -161,10 +165,6 @@
     return (dict && dict[key]) || I18N_FALLBACK.en[key];
   }
 
-  // Używane TYLKO gdy pole nie jest jeszcze w OPTION_ID_MAP — siatka
-  // bezpieczeństwa, nie główny mechanizm. Celowo NIE dopasowuje słów
-  // futra (futr/fur/fell/fourrure) — dzięki temu etykieta futra
-  // zawsze przechodzi bez zmian, zgodnie z decyzją "pokazuj jak jest".
   function familyFromLabel(label){
     return label.replace(/^\*?\s*(materia[lł]|tkanina|fabric|material|stoff|tissu)\s*/i, '').trim();
   }
@@ -278,18 +278,36 @@
       setHOption(entry.name, opt && opt.value !== undefined ? opt.value : opt);
     }
 
-    function makeSwatchItem(url, family, name, onClick){
+    // baseUrl: URL BEZ rozszerzenia, lub null/'' gdy nie ma obrazka.
+    // Próbuje po kolei IMG_EXTENSIONS; dopiero gdy wszystkie zawiodą,
+    // usuwa <img> i loguje do missingImages. resolvedUrl trzyma pełny
+    // (z rozszerzeniem) URL, który faktycznie się załadował — używany
+    // przez podgląd na hover, żeby nie zgadywać rozszerzenia tam też.
+    function makeSwatchItem(baseUrl, family, name, onClick){
       var item = document.createElement('div'); item.className = 'psw-item';
       var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'psw-swatch';
       var fullLabel = family ? (family + ' ' + name) : name;
-      if (url){
+      var resolvedUrl = null;
+      if (baseUrl){
         var img = document.createElement('img');
-        img.src = url; img.alt = fullLabel;
-        img.onerror = function(){ img.remove(); missingImages.push(fullLabel + '  ->  ' + url); };
+        img.alt = fullLabel;
+        var extIndex = 0;
+        var tryNextExt = function(){
+          if (extIndex >= IMG_EXTENSIONS.length){
+            img.remove();
+            missingImages.push(fullLabel + '  ->  ' + baseUrl + '.{' + IMG_EXTENSIONS.join('|') + '}');
+            return;
+          }
+          img.src = baseUrl + '.' + IMG_EXTENSIONS[extIndex];
+          extIndex++;
+        };
+        img.onerror = tryNextExt;
+        img.onload = function(){ resolvedUrl = img.src; };
+        tryNextExt();
         btn.appendChild(img);
       }
-      btn.addEventListener('mouseenter', function(e){ showPreview(e.clientX, e.clientY, url, family, name); });
-      btn.addEventListener('mousemove', function(e){ showPreview(e.clientX, e.clientY, url, family, name); });
+      btn.addEventListener('mouseenter', function(e){ showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
+      btn.addEventListener('mousemove', function(e){ showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
       btn.addEventListener('mouseleave', hidePreview);
       btn.addEventListener('click', onClick.bind(item));
       var cap = document.createElement('div'); cap.className = 'psw-cap'; cap.textContent = fullLabel;
@@ -334,7 +352,7 @@
       var row = document.createElement('div'); row.className = 'psw-row';
       optionsOf(g).forEach(function(o){
         var caption = o.price ? (o.text + ' ' + o.price) : o.text;
-        var item = makeSwatchItem(imgFor('plywood', o.text), null, caption, function(){
+        var item = makeSwatchItem(imgBaseFor('plywood', o.text), null, caption, function(){
           setEntryValue(g, o);
           row.querySelectorAll('.psw-swatch').forEach(function(x){ x.classList.remove('active'); });
           this.querySelector('.psw-swatch').classList.add('active');
@@ -375,10 +393,10 @@
         rowEl.innerHTML = '';
         optionsOf(fam.entry).forEach(function(o){
           var imgKey = (imgRole === 'fur' && FUR_VALUE_CANONICAL[o.value]) ? FUR_VALUE_CANONICAL[o.value] : o.text;
-          var url = imgFor(imgRole, imgKey);
+          var baseUrl = imgBaseFor(imgRole, imgKey);
           var baseLabel = combineLabel(fam.name, o.text);
           var fullLabel = o.price ? (baseLabel + ' ' + o.price) : baseLabel;
-          var item = makeSwatchItem(url, null, fullLabel, function(){
+          var item = makeSwatchItem(baseUrl, null, fullLabel, function(){
             clearOthers(fam.entry);
             setEntryValue(fam.entry, o);
             rowEl.querySelectorAll('.psw-swatch').forEach(function(x){ x.classList.remove('active'); });

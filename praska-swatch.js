@@ -18,34 +18,8 @@
 
   var ASSET_BASE = 'https://praska.shop/userdata/public/assets/warianty/';
 
-  // Kolejność prób rozszerzeń pliku obrazka — Peter potwierdził, że
-  // ma mieszankę .jpg i .jpeg w folderze assetów. Próbujemy .jpg
-  // pierwsze (większość plików), potem .jpeg, zanim uznamy zdjęcie
-  // za brakujące.
   var IMG_EXTENSIONS = ['jpg', 'jpeg'];
 
-  // ============================================================
-  // MAPA option-id -> rola pola.
-  //
-  // Potwierdzone na żywo (DE/FR/PL/EN): 143, 135, 162, 57, 107.
-  // Potwierdzone z tabeli tłumaczeń "A. Labels": 109 (ALOVA), 64
-  // (ROZMIAR/SIZE/GRÖSSE), 124 (ŚREDNICA/DIAMETER), 131 (Wymiary/
-  // DIMENSIONS), 165 (DŁUGOŚĆ MOSTKA/BRIDGE LENGTH), 149 (Strona
-  // lewa lub prawa/LEFT OR RIGHT SIDE).
-  //
-  // 123 (KOLOR FUTRA/FUR COLOR) i 141 (FUTRO SZEROKIE PASY/FUR WIDE
-  // STRIPES) potwierdzone z osobnych zrzutów wartości opcji — dwa
-  // niezależne pola futra, każde z własną paletą kolorów. Celowo BEZ
-  // klucza "family" — Peter wybrał, żeby zakładka/nagłówek pokazywał
-  // surową przetłumaczoną etykietę pola, a nie jedno stałe słowo.
-  //
-  // NIE zmapowane celowo — brak istniejącej "role" dla nich, czekają
-  // na decyzję/próbkę:
-  //   63  POCHYLNIA / RAMP
-  //   75  KOLOR WEWNĄTRZ / INNER COLOR
-  //   172 WZÓR / PATTERN — UWAGA: to INNY option-id niż 135
-  //       "Materiał PATTERN", nie mylić.
-  // ============================================================
   var OPTION_ID_MAP = {
     '143': { role: 'plywood' },
     '135': { role: 'material', family: 'PATTERN' },
@@ -62,16 +36,6 @@
     '141': { role: 'fur' }
   };
 
-  // ============================================================
-  // Wartości opcji futra są przetłumaczone per język (np. PL "czarny"
-  // vs EN "black" vs DE "schwarz"), inaczej niż sklejka/materiał,
-  // gdzie wartości zostają identyczne we wszystkich językach. Zdjęcia
-  // futra są nazwane wg kanonicznej angielskiej nazwy (spacje -> "-"),
-  // więc żeby PL/DE/FR strona nie szukała pliku pod przetłumaczoną
-  // nazwą, mapujemy stabilne (niezależne od języka) ID wartości na tę
-  // kanoniczną nazwę przed zbudowaniem URL-a obrazka. ID 524 (écru,
-  // "Used by: 0") dodane dla kompletności, w praktyce nieużywane.
-  // ============================================================
   var FUR_VALUE_CANONICAL = {
     '524': 'écru',
     '525': 'black',
@@ -88,19 +52,37 @@
     '849': 'milky white 01'
   };
 
-  function slug(s){
+  function normalizeDiacritics(s){
     return String(s).toLowerCase()
       .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e').replace(/ł/g,'l')
       .replace(/ń/g,'n').replace(/ó/g,'o').replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z')
-      .replace(/\s+/g,'-').trim();
+      .replace(/\s+/g,' ').trim();
   }
 
-  // Zwraca URL BEZ rozszerzenia — próby .jpg/.jpeg dzieją się w
-  // makeSwatchItem(), bo to tam wiemy, które rozszerzenie faktycznie
-  // zadziałało (potrzebne też do podglądu na hover).
-  function imgBaseFor(role, value){
-    if (role === 'plywood') return ASSET_BASE + 'sklejka/' + slug(value);
-    return ASSET_BASE + slug(value);
+  // ============================================================
+  // Repo assetów ma niespójne separatory w nazwach plików (myślnik /
+  // podkreślnik / spacja wymieszane). Zamiast zmusić Petera do
+  // natychmiastowego porządkowania całego folderu, próbujemy trzech
+  // wariantów nazwy w kolejności: myślnik (obecny standard, większość
+  // plików trafia tu za pierwszym razem) -> podkreślnik -> spacja.
+  // CELOWO bez wariantów wielkości liter — to już byłaby zbyt duża
+  // kombinatoryka; pliki muszą być zapisane małymi literami.
+  // ============================================================
+  function slugVariants(s){
+    var norm = normalizeDiacritics(s);
+    return [
+      norm.replace(/\s+/g, '-'),
+      norm.replace(/\s+/g, '_'),
+      norm
+    ];
+  }
+
+  // Zwraca WSZYSTKIE kandydujące URL-e bazowe (bez rozszerzenia) dla
+  // danej wartości — makeSwatchItem() próbuje ich po kolei, krzyżując
+  // z IMG_EXTENSIONS, zanim uzna zdjęcie za brakujące.
+  function imgBasesFor(role, value){
+    var prefix = (role === 'plywood') ? (ASSET_BASE + 'sklejka/') : ASSET_BASE;
+    return slugVariants(value).map(function(v){ return prefix + v; });
   }
 
   function combineLabel(family, text){
@@ -278,32 +260,37 @@
       setHOption(entry.name, opt && opt.value !== undefined ? opt.value : opt);
     }
 
-    // baseUrl: URL BEZ rozszerzenia, lub null/'' gdy nie ma obrazka.
-    // Próbuje po kolei IMG_EXTENSIONS; dopiero gdy wszystkie zawiodą,
-    // usuwa <img> i loguje do missingImages. resolvedUrl trzyma pełny
-    // (z rozszerzeniem) URL, który faktycznie się załadował — używany
-    // przez podgląd na hover, żeby nie zgadywać rozszerzenia tam też.
-    function makeSwatchItem(baseUrl, family, name, onClick){
+    // baseUrls: tablica kandydujących URL-i BEZ rozszerzenia (patrz
+    // imgBasesFor/slugVariants), lub null gdy nie ma obrazka. Próbuje
+    // każdego wariantu × każdego rozszerzenia po kolei; dopiero gdy
+    // wszystkie kombinacje zawiodą, usuwa <img> i loguje szczegóły do
+    // missingImages. resolvedUrl trzyma pełny URL, który faktycznie
+    // się załadował — używany przez podgląd na hover.
+    function makeSwatchItem(baseUrls, family, name, onClick){
       var item = document.createElement('div'); item.className = 'psw-item';
       var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'psw-swatch';
       var fullLabel = family ? (family + ' ' + name) : name;
       var resolvedUrl = null;
-      if (baseUrl){
+      if (baseUrls && baseUrls.length){
         var img = document.createElement('img');
         img.alt = fullLabel;
-        var extIndex = 0;
-        var tryNextExt = function(){
-          if (extIndex >= IMG_EXTENSIONS.length){
+        var combos = [];
+        baseUrls.forEach(function(b){
+          IMG_EXTENSIONS.forEach(function(ext){ combos.push(b + '.' + ext); });
+        });
+        var idx = 0;
+        var tryNext = function(){
+          if (idx >= combos.length){
             img.remove();
-            missingImages.push(fullLabel + '  ->  ' + baseUrl + '.{' + IMG_EXTENSIONS.join('|') + '}');
+            missingImages.push(fullLabel + '  ->  tried ' + combos.length + ' filename variants, none found (e.g. ' + combos[0] + ')');
             return;
           }
-          img.src = baseUrl + '.' + IMG_EXTENSIONS[extIndex];
-          extIndex++;
+          img.src = combos[idx];
+          idx++;
         };
-        img.onerror = tryNextExt;
+        img.onerror = tryNext;
         img.onload = function(){ resolvedUrl = img.src; };
-        tryNextExt();
+        tryNext();
         btn.appendChild(img);
       }
       btn.addEventListener('mouseenter', function(e){ showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
@@ -352,7 +339,7 @@
       var row = document.createElement('div'); row.className = 'psw-row';
       optionsOf(g).forEach(function(o){
         var caption = o.price ? (o.text + ' ' + o.price) : o.text;
-        var item = makeSwatchItem(imgBaseFor('plywood', o.text), null, caption, function(){
+        var item = makeSwatchItem(imgBasesFor('plywood', o.text), null, caption, function(){
           setEntryValue(g, o);
           row.querySelectorAll('.psw-swatch').forEach(function(x){ x.classList.remove('active'); });
           this.querySelector('.psw-swatch').classList.add('active');
@@ -393,10 +380,10 @@
         rowEl.innerHTML = '';
         optionsOf(fam.entry).forEach(function(o){
           var imgKey = (imgRole === 'fur' && FUR_VALUE_CANONICAL[o.value]) ? FUR_VALUE_CANONICAL[o.value] : o.text;
-          var baseUrl = imgBaseFor(imgRole, imgKey);
+          var baseUrls = imgBasesFor(imgRole, imgKey);
           var baseLabel = combineLabel(fam.name, o.text);
           var fullLabel = o.price ? (baseLabel + ' ' + o.price) : baseLabel;
-          var item = makeSwatchItem(baseUrl, null, fullLabel, function(){
+          var item = makeSwatchItem(baseUrls, null, fullLabel, function(){
             clearOthers(fam.entry);
             setEntryValue(fam.entry, o);
             rowEl.querySelectorAll('.psw-swatch').forEach(function(x){ x.classList.remove('active'); });

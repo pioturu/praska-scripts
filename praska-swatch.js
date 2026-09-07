@@ -18,6 +18,71 @@
 
   var ASSET_BASE = 'https://praska.shop/userdata/public/assets/warianty/';
 
+  // ============================================================
+  // MAPA option-id -> rola pola.
+  //
+  // Potwierdzone na żywo (DE/FR/PL/EN): 143, 135, 162, 57, 107.
+  // Potwierdzone z tabeli tłumaczeń "A. Labels": 109 (ALOVA), 64
+  // (ROZMIAR/SIZE/GRÖSSE), 124 (ŚREDNICA/DIAMETER), 131 (Wymiary/
+  // DIMENSIONS), 165 (DŁUGOŚĆ MOSTKA/BRIDGE LENGTH), 149 (Strona
+  // lewa lub prawa/LEFT OR RIGHT SIDE).
+  //
+  // 123 (KOLOR FUTRA/FUR COLOR) i 141 (FUTRO SZEROKIE PASY/FUR WIDE
+  // STRIPES) potwierdzone z osobnych zrzutów wartości opcji — dwa
+  // niezależne pola futra, każde z własną paletą kolorów. Celowo BEZ
+  // klucza "family" — Peter wybrał, żeby zakładka/nagłówek pokazywał
+  // surową przetłumaczoną etykietę pola (np. "FUR COLOR" / "KOLOR
+  // FUTRA"), a nie jedno stałe uniwersalne słowo.
+  //
+  // NIE zmapowane celowo — brak istniejącej "role" dla nich, czekają
+  // na decyzję/próbkę:
+  //   63  POCHYLNIA / RAMP
+  //   75  KOLOR WEWNĄTRZ / INNER COLOR
+  //   172 WZÓR / PATTERN — UWAGA: to INNY option-id niż 135
+  //       "Materiał PATTERN", nie mylić.
+  // ============================================================
+  var OPTION_ID_MAP = {
+    '143': { role: 'plywood' },
+    '135': { role: 'material', family: 'PATTERN' },
+    '162': { role: 'material', family: 'DOT' },
+    '57':  { role: 'material', family: 'LINCOLN' },
+    '107': { role: 'material', family: 'RAFA' },
+    '109': { role: 'material', family: 'ALOVA' },
+    '64':  { role: 'size' },
+    '124': { role: 'size' },
+    '131': { role: 'size' },
+    '165': { role: 'size' },
+    '149': { role: 'side' },
+    '123': { role: 'fur' },
+    '141': { role: 'fur' }
+  };
+
+  // ============================================================
+  // Wartości opcji futra są przetłumaczone per język (np. PL "czarny"
+  // vs EN "black" vs DE "schwarz"), inaczej niż sklejka/materiał,
+  // gdzie wartości zostają identyczne we wszystkich językach. Zdjęcia
+  // futra są nazwane wg kanonicznej angielskiej nazwy (spacje -> "-"),
+  // więc żeby PL/DE/FR strona nie szukała pliku pod przetłumaczoną
+  // nazwą, mapujemy stabilne (niezależne od języka) ID wartości na tę
+  // kanoniczną nazwę przed zbudowaniem URL-a obrazka. ID 524 (écru,
+  // "Used by: 0") dodane dla kompletności, w praktyce nieużywane.
+  // ============================================================
+  var FUR_VALUE_CANONICAL = {
+    '524': 'écru',
+    '525': 'black',
+    '593': 'milky white',
+    '617': 'cream 03',
+    '618': 'chocolate 17',
+    '619': 'khaki 37',
+    '620': 'bottle green 39',
+    '622': 'cinnamon 56',
+    '624': 'turquoise 75',
+    '628': 'grey 86',
+    '629': 'graphite 90',
+    '630': 'black 100',
+    '849': 'milky white 01'
+  };
+
   function slug(s){
     return String(s).toLowerCase()
       .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e').replace(/ł/g,'l')
@@ -25,9 +90,12 @@
       .replace(/\s+/g,'-').trim();
   }
 
-  function imgFor(groupLabel, value){
-    if (/sklejk|plywood/i.test(groupLabel)) return ASSET_BASE + 'sklejka/' + slug(value) + '.jpg';
-    if (/futr|\bfur\b/i.test(groupLabel)) return ASSET_BASE + encodeURIComponent(value) + '.jpg';
+  // Sklejka ma podfolder, wszystko inne (materiał, futro po zamianie
+  // na nazwę kanoniczną) trafia bezpośrednio do ASSET_BASE. Futro nie
+  // ma już osobnej gałęzi z encodeURIComponent — to była niezgodność
+  // z realną konwencją nazw plików (spacje -> "-", nie %20).
+  function imgFor(role, value){
+    if (role === 'plywood') return ASSET_BASE + 'sklejka/' + slug(value) + '.jpg';
     return ASSET_BASE + slug(value) + '.jpg';
   }
 
@@ -55,10 +123,6 @@
     return (required ? '<span class="color-primary-500 psw-req">*</span> ' : '') + text;
   }
 
-  // Sprawdza REALNY stan pola (nie wygląd) — czy natywny select/radio,
-  // na który zapisujemy wybór, faktycznie ma ustawioną wartość. Używane
-  // przez naszą własną walidację poniżej, niezależną od tego, czy
-  // walidacja Shopera poprawnie widzi wizualnie ukryte pola.
   function entryHasValue(entry){
     if (entry.kind === 'radio'){
       return entry.radios.some(function(r){ return r.checked; });
@@ -69,21 +133,14 @@
   }
   var requiredChecks = [];
 
-  // ============================================================
-  // TŁUMACZENIA: NAJPIERW próbujemy przeczytać je z mostu wypisanego
-  // przez Twig (element #psw-i18n-bridge z atrybutami data-*) — to
-  // realne tłumaczenia Shopera z pliku Tłumaczenia JSON. Jeśli mostu
-  // nie ma (np. Twig się jeszcze nie wyrenderował / inny mechanizm),
-  // spadamy na wbudowaną tabelę zapasową — więc działa tak czy inaczej.
-  // ============================================================
   var I18N_FALLBACK = {
-    pl: { choose: 'wybierz', showFabricCatalog: 'POKAŻ KATALOG TKANIN', showPlywoodCatalog: 'POKAŻ KATALOG SKLEJKI' },
-    en: { choose: 'choose', showFabricCatalog: 'SHOW FABRIC CATALOG', showPlywoodCatalog: 'SHOW PLYWOOD CATALOG' },
-    de: { choose: 'wählen', showFabricCatalog: 'STOFFKATALOG ANZEIGEN', showPlywoodCatalog: 'SPERRHOLZKATALOG ANZEIGEN' },
-    fr: { choose: 'choisir', showFabricCatalog: 'VOIR LE CATALOGUE DE TISSUS', showPlywoodCatalog: 'VOIR LE CATALOGUE DE CONTREPLAQUÉ' },
-    it: { choose: 'scegli', showFabricCatalog: 'MOSTRA CATALOGO TESSUTI', showPlywoodCatalog: 'MOSTRA CATALOGO COMPENSATO' },
-    nl: { choose: 'kiezen', showFabricCatalog: 'TOON STOFFENCATALOGUS', showPlywoodCatalog: 'TOON MULTIPLEXCATALOGUS' },
-    cs: { choose: 'vybrat', showFabricCatalog: 'ZOBRAZIT KATALOG LÁTEK', showPlywoodCatalog: 'ZOBRAZIT KATALOG PŘEKLIŽKY' }
+    pl: { choose: 'wybierz', showFabricCatalog: 'POKAŻ KATALOG TKANIN', showPlywoodCatalog: 'POKAŻ KATALOG SKLEJKI', furHeading: 'Futro' },
+    en: { choose: 'choose', showFabricCatalog: 'SHOW FABRIC CATALOG', showPlywoodCatalog: 'SHOW PLYWOOD CATALOG', furHeading: 'Fur' },
+    de: { choose: 'wählen', showFabricCatalog: 'STOFFKATALOG ANZEIGEN', showPlywoodCatalog: 'SPERRHOLZKATALOG ANZEIGEN', furHeading: 'Fell' },
+    fr: { choose: 'choisir', showFabricCatalog: 'VOIR LE CATALOGUE DE TISSUS', showPlywoodCatalog: 'VOIR LE CATALOGUE DE CONTREPLAQUÉ', furHeading: 'Fourrure' },
+    it: { choose: 'scegli', showFabricCatalog: 'MOSTRA CATALOGO TESSUTI', showPlywoodCatalog: 'MOSTRA CATALOGO COMPENSATO', furHeading: 'Pelliccia' },
+    nl: { choose: 'kiezen', showFabricCatalog: 'TOON STOFFENCATALOGUS', showPlywoodCatalog: 'TOON MULTIPLEXCATALOGUS', furHeading: 'Bont' },
+    cs: { choose: 'vybrat', showFabricCatalog: 'ZOBRAZIT KATALOG LÁTEK', showPlywoodCatalog: 'ZOBRAZIT KATALOG PŘEKLIŽKY', furHeading: 'Kožešina' }
   };
 
   var LOCALE = (function(){
@@ -104,8 +161,12 @@
     return (dict && dict[key]) || I18N_FALLBACK.en[key];
   }
 
+  // Używane TYLKO gdy pole nie jest jeszcze w OPTION_ID_MAP — siatka
+  // bezpieczeństwa, nie główny mechanizm. Celowo NIE dopasowuje słów
+  // futra (futr/fur/fell/fourrure) — dzięki temu etykieta futra
+  // zawsze przechodzi bez zmian, zgodnie z decyzją "pokazuj jak jest".
   function familyFromLabel(label){
-    return label.replace(/^\*?\s*(materia[lł]|tkanina|fabric|material)\s*/i, '').trim();
+    return label.replace(/^\*?\s*(materia[lł]|tkanina|fabric|material|stoff|tissu)\s*/i, '').trim();
   }
 
   function setHOption(name, value){
@@ -148,36 +209,40 @@
     var radioWrappers = [...document.querySelectorAll('radio-variant-option')];
     var groups = { material: [], fur: [], plywood: [], side: [], size: [] };
 
+    function classify(entry, label, optionId){
+      var mapped = OPTION_ID_MAP[optionId];
+      if (mapped){
+        entry.family = mapped.family;
+        groups[mapped.role].push(entry);
+        return true;
+      }
+      if (/futr|\bfur\b|fell|fourrure/i.test(label)) groups.fur.push(entry);
+      else if (/tkanin|materia|fabric|material|stoff|tissu/i.test(label)) groups.material.push(entry);
+      else if (/sklejk|plywood|sperrholz|contreplaqu/i.test(label)) groups.plywood.push(entry);
+      else if (/strona|\bside\b|seite|côté|cote/i.test(label)) groups.side.push(entry);
+      else if (/rozmiar|średnic|srednic|wymiar|\bsize\b|größe|grösse|grosse|breite|durchmesser|taille|diamètre|diametre|largeur/i.test(label)) groups.size.push(entry);
+      else return false;
+      return true;
+    }
+
     wrappers.forEach(function(w){
       var label = w.getAttribute('validation-name-label') || '';
+      var optionId = w.getAttribute('option-id') || '';
       var hsel = w.querySelector('h-select');
       if (!hsel) return;
       var name = hsel.getAttribute('control-name');
       var entry = { kind: 'select', name: name, label: label, el: w };
-
-      if (/futr|\bfur\b/i.test(label)) groups.fur.push(entry);
-      else if (/tkanin|materia|fabric|material/i.test(label)) groups.material.push(entry);
-      else if (/sklejk|plywood/i.test(label)) groups.plywood.push(entry);
-      else if (/strona|\bside\b/i.test(label)) groups.side.push(entry);
-      else if (/rozmiar|średnic|srednic|wymiar|\bsize\b/i.test(label)) groups.size.push(entry);
-      else return;
-
+      if (!classify(entry, label, optionId)) return;
       w.classList.add('psw-hidden-native');
     });
 
     radioWrappers.forEach(function(w){
       var label = w.getAttribute('validation-name-label') || '';
+      var optionId = w.getAttribute('option-id') || '';
       var radios = [...w.querySelectorAll('input[type="radio"]')];
       if (!radios.length) return;
       var entry = { kind: 'radio', label: label, el: w, radios: radios };
-
-      if (/sklejk|plywood/i.test(label)) groups.plywood.push(entry);
-      else if (/futr|\bfur\b/i.test(label)) groups.fur.push(entry);
-      else if (/tkanin|materia|fabric|material/i.test(label)) groups.material.push(entry);
-      else if (/strona|\bside\b/i.test(label)) groups.side.push(entry);
-      else if (/rozmiar|średnic|srednic|wymiar|\bsize\b/i.test(label)) groups.size.push(entry);
-      else return;
-
+      if (!classify(entry, label, optionId)) return;
       w.classList.add('psw-hidden-native');
     });
 
@@ -240,8 +305,8 @@
       wrap.appendChild(a);
     }
 
-    ['side', 'size'].forEach(function(t){
-      groups[t].forEach(function(g){
+    ['side', 'size'].forEach(function(kind){
+      groups[kind].forEach(function(g){
         var wrap = document.createElement('div'); wrap.className = 'psw-group';
         wrap.innerHTML = '<div class="psw-label"><span>' + labelHtml(g.label, isRequired([g])) + '</span></div>';
         var row = document.createElement('div'); row.className = 'psw-row';
@@ -269,7 +334,7 @@
       var row = document.createElement('div'); row.className = 'psw-row';
       optionsOf(g).forEach(function(o){
         var caption = o.price ? (o.text + ' ' + o.price) : o.text;
-        var item = makeSwatchItem(imgFor(g.label, o.text), null, caption, function(){
+        var item = makeSwatchItem(imgFor('plywood', o.text), null, caption, function(){
           setEntryValue(g, o);
           row.querySelectorAll('.psw-swatch').forEach(function(x){ x.classList.remove('active'); });
           this.querySelector('.psw-swatch').classList.add('active');
@@ -284,20 +349,20 @@
       }
     });
 
-    function renderTabbedSection(entries, fallbackHeading, catalogUrl){
+    function renderTabbedSection(entries, fallbackHeading, catalogUrl, imgRole){
       if (!entries.length) return;
       var wrap = document.createElement('div'); wrap.className = 'psw-group';
       var labelEl = document.createElement('div'); labelEl.className = 'psw-label';
       var groupHeading = entries.length === 1
         ? entries[0].label
-        : ((entries[0].label.match(/tkanina|materia[lł]|fabric|material/i) || [fallbackHeading])[0]);
+        : ((entries[0].label.match(/tkanina|materia[lł]|fabric|material|stoff|tissu/i) || [fallbackHeading])[0]);
       var required = entries.length > 1 ? true : isRequired(entries);
       labelEl.innerHTML = '<span>' + labelHtml(groupHeading, required) + '</span><b class="psw-sel">' + t('choose') + '</b>';
       wrap.appendChild(labelEl);
 
       var tabsEl = document.createElement('div'); tabsEl.className = 'psw-tabs';
       var rowEl = document.createElement('div'); rowEl.className = 'psw-row';
-      var families = entries.map(function(g){ return { name: familyFromLabel(g.label) || g.label, entry: g }; });
+      var families = entries.map(function(g){ return { name: g.family || familyFromLabel(g.label) || g.label, entry: g }; });
 
       function clearOthers(exceptEntry){
         entries.forEach(function(g){
@@ -309,7 +374,8 @@
       function renderFamily(fam){
         rowEl.innerHTML = '';
         optionsOf(fam.entry).forEach(function(o){
-          var url = imgFor(fam.name, o.text);
+          var imgKey = (imgRole === 'fur' && FUR_VALUE_CANONICAL[o.value]) ? FUR_VALUE_CANONICAL[o.value] : o.text;
+          var url = imgFor(imgRole, imgKey);
           var baseLabel = combineLabel(fam.name, o.text);
           var fullLabel = o.price ? (baseLabel + ' ' + o.price) : baseLabel;
           var item = makeSwatchItem(url, null, fullLabel, function(){
@@ -324,14 +390,14 @@
       }
 
       families.forEach(function(fam, i){
-        var t = document.createElement('button'); t.type = 'button'; t.textContent = fam.name;
-        if (i === 0) t.classList.add('active');
-        t.addEventListener('click', function(){
+        var tabBtn = document.createElement('button'); tabBtn.type = 'button'; tabBtn.textContent = fam.name;
+        if (i === 0) tabBtn.classList.add('active');
+        tabBtn.addEventListener('click', function(){
           tabsEl.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
-          t.classList.add('active');
+          tabBtn.classList.add('active');
           renderFamily(fam);
         });
-        tabsEl.appendChild(t);
+        tabsEl.appendChild(tabBtn);
       });
       if (families.length > 1) wrap.appendChild(tabsEl);
       wrap.appendChild(rowEl);
@@ -343,8 +409,8 @@
       }
     }
 
-    renderTabbedSection(groups.material, 'Materiał', 'https://catalogues.praska.shop/96d6646d5f.html');
-    renderTabbedSection(groups.fur, 'Futro');
+    renderTabbedSection(groups.material, 'Materiał', 'https://catalogues.praska.shop/96d6646d5f.html', 'material');
+    renderTabbedSection(groups.fur, t('furHeading'), null, 'fur');
 
     var allEntries = groups.material.concat(groups.fur, groups.plywood, groups.side, groups.size);
     var anchor = allEntries[0].el;
@@ -377,21 +443,6 @@
   });
   pswObserver.observe(document.body, { childList: true, subtree: true });
 
-  // ============================================================
-  // WŁASNA WALIDACJA "DODAJ DO KOSZYKA".
-  //
-  // Powód: nasze pola ukrywamy techniką "visually hidden" (1x1px,
-  // przycięte) — natywna walidacja Shopera prawdopodobnie sprawdza
-  // nie tylko "czy pole ma wartość", ale też "czy jest realnie
-  // widoczne", i pomija w ten sposób nasze ukryte pola nawet gdy są
-  // oznaczone jako wymagane (*). Efekt: dało się dodać produkt do
-  // koszyka bez wybrania wymaganego wariantu.
-  //
-  // Ta warstwa nie zgaduje wewnętrznej logiki Shopera — sprawdza
-  // REALNY stan (entryHasValue) każdej zarejestrowanej wymaganej
-  // grupy i blokuje kliknięcie, jeśli czegoś brakuje, niezależnie
-  // od przyczyny, dla której natywna walidacja tego nie złapała.
-  // ============================================================
   var ADD_TO_CART_PATTERN = /dodaj do koszyka|add to cart|in den warenkorb|ajouter au panier|aggiungi al carrello|toevoegen aan winkelwagen|přidat do košíku/i;
 
   function flashMissing(target){
@@ -403,7 +454,7 @@
   document.addEventListener('click', function(e){
     var btn = e.target.closest ? e.target.closest('button, a') : null;
     if (!btn || !ADD_TO_CART_PATTERN.test(btn.textContent || '')) return;
-    if (!requiredChecks.length) return; // nic do sprawdzenia (np. produkt bez naszych grup)
+    if (!requiredChecks.length) return;
 
     var firstMissing = requiredChecks.find(function(c){ return !c.isSatisfied(); });
     if (firstMissing){
@@ -411,7 +462,7 @@
       e.stopImmediatePropagation();
       flashMissing(firstMissing.scrollTarget);
     }
-  }, true); // capture: łapiemy PRZED natywnym handlerem Shopera
+  }, true);
 
   if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', maybeRebuild); }
   else { maybeRebuild(); }

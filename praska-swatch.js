@@ -20,6 +20,36 @@
 
   var IMG_EXTENSIONS = ['jpg', 'jpeg'];
 
+  // ============================================================
+  // MAPA option-id -> rola pola.
+  //
+  // Potwierdzone na żywo (DE/FR/PL/EN): 143, 135, 162, 57, 107.
+  // Potwierdzone z tabeli tłumaczeń "A. Labels": 109 (ALOVA), 64
+  // (ROZMIAR/SIZE/GRÖSSE), 124 (ŚREDNICA/DIAMETER), 131 (Wymiary/
+  // DIMENSIONS), 165 (DŁUGOŚĆ MOSTKA/BRIDGE LENGTH), 149 (Strona
+  // lewa lub prawa/LEFT OR RIGHT SIDE).
+  //
+  // Pola futra — pięć różnych option-id, wszystkie role:'fur', BEZ
+  // klucza "family" (Peter: pokazuj surową przetłumaczoną etykietę
+  // pola, nie stałe słowo):
+  //   123 KOLOR FUTRA / FUR COLOR          — Grupa 21 (MATERIAŁ, admin)
+  //   141 FUTRO SZEROKIE PASY / FUR WIDE STRIPES — Grupa 21 (MATERIAŁ, admin)
+  //   142 FUTRO / FUR                       — Grupa 32
+  //   152 FUTRO / FUR                       — Grupa 35 (SKLEJKA+FUTRO,
+  //       tylko admin-side grupowanie; sama opcja to zwykłe pole futra,
+  //       bez specjalnej struktury łączonej)
+  //   166 FUTRO FLUFFY / FLUFFY FUR         — Grupa 36
+  // "Grupa" to wewnętrzna kategoria Shopera do organizacji opcji w
+  // panelu admina — nie wpływa na to, jak pole renderuje się na
+  // froncie, więc nie ma odzwierciedlenia w kodzie.
+  //
+  // NIE zmapowane celowo — brak istniejącej "role" dla nich, czekają
+  // na decyzję/próbkę:
+  //   63  POCHYLNIA / RAMP
+  //   75  KOLOR WEWNĄTRZ / INNER COLOR
+  //   172 WZÓR / PATTERN — UWAGA: to INNY option-id niż 135
+  //       "Materiał PATTERN", nie mylić.
+  // ============================================================
   var OPTION_ID_MAP = {
     '143': { role: 'plywood' },
     '135': { role: 'material', family: 'PATTERN' },
@@ -33,7 +63,10 @@
     '165': { role: 'size' },
     '149': { role: 'side' },
     '123': { role: 'fur' },
-    '141': { role: 'fur' }
+    '141': { role: 'fur' },
+    '142': { role: 'fur' },
+    '152': { role: 'fur' },
+    '166': { role: 'fur' }
   };
 
   var FUR_VALUE_CANONICAL = {

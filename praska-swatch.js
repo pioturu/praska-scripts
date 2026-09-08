@@ -52,36 +52,52 @@
     '849': 'milky white 01'
   };
 
-  function normalizeDiacritics(s){
-    return String(s).toLowerCase()
-      .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e').replace(/ł/g,'l')
-      .replace(/ń/g,'n').replace(/ó/g,'o').replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z')
+  // Usuwa polskie znaki diakrytyczne NIEZALEŻNIE od wielkości liter
+  // (celowo bez wymuszania case'u tutaj — to robi slugVariants niżej,
+  // osobno dla wariantu małych i wielkich liter).
+  function stripDiacritics(s){
+    return String(s)
+      .replace(/ą/g,'a').replace(/Ą/g,'A')
+      .replace(/ć/g,'c').replace(/Ć/g,'C')
+      .replace(/ę/g,'e').replace(/Ę/g,'E')
+      .replace(/ł/g,'l').replace(/Ł/g,'L')
+      .replace(/ń/g,'n').replace(/Ń/g,'N')
+      .replace(/ó/g,'o').replace(/Ó/g,'O')
+      .replace(/ś/g,'s').replace(/Ś/g,'S')
+      .replace(/ź/g,'z').replace(/Ź/g,'Z')
+      .replace(/ż/g,'z').replace(/Ż/g,'Z')
       .replace(/\s+/g,' ').trim();
   }
 
   // ============================================================
-  // Repo assetów ma niespójne separatory w nazwach plików (myślnik /
-  // podkreślnik / spacja wymieszane). Zamiast zmusić Petera do
-  // natychmiastowego porządkowania całego folderu, próbujemy trzech
-  // wariantów nazwy w kolejności: myślnik (obecny standard, większość
-  // plików trafia tu za pierwszym razem) -> podkreślnik -> spacja.
-  // CELOWO bez wariantów wielkości liter — to już byłaby zbyt duża
-  // kombinatoryka; pliki muszą być zapisane małymi literami.
+  // Repo assetów ma niespójne separatory ORAZ niespójną wielkość
+  // liter w nazwach plików. Próbujemy kolejno: myślnik/podkreślnik/
+  // spacja małymi literami (obecny standard, większość plików trafia
+  // tu za pierwszym-trzecim razem) -> te same trzy separatory
+  // WIELKIMI literami (rzadszy przypadek, świadomie na końcu — Peter
+  // zaakceptował dodatkowe zapytania sieciowe jako koszt tego
+  // podejścia). 6 wariantów nazwy x 2 rozszerzenia = do 12 prób,
+  // zanim zdjęcie zostanie uznane za brakujące.
   // ============================================================
   function slugVariants(s){
-    var norm = normalizeDiacritics(s);
-    return [
-      norm.replace(/\s+/g, '-'),
-      norm.replace(/\s+/g, '_'),
-      norm
-    ];
+    var stripped = stripDiacritics(s);
+    var lower = stripped.toLowerCase();
+    var upper = stripped.toUpperCase();
+    var seps = ['-', '_', ' '];
+    var variants = [];
+    seps.forEach(function(sep){ variants.push(lower.replace(/\s+/g, sep)); });
+    seps.forEach(function(sep){ variants.push(upper.replace(/\s+/g, sep)); });
+    return variants;
   }
 
-  // Zwraca WSZYSTKIE kandydujące URL-e bazowe (bez rozszerzenia) dla
-  // danej wartości — makeSwatchItem() próbuje ich po kolei, krzyżując
-  // z IMG_EXTENSIONS, zanim uzna zdjęcie za brakujące.
+  // Zwraca WSZYSTKIE kandydujące URL-e bazowe (bez rozszerzenia).
+  // Sklejka -> podfolder "sklejka/", futro -> podfolder "futra/"
+  // (Peter przeniósł tam wszystkie grafiki futra, analogicznie do
+  // sklejki), materiał -> bezpośrednio w ASSET_BASE.
   function imgBasesFor(role, value){
-    var prefix = (role === 'plywood') ? (ASSET_BASE + 'sklejka/') : ASSET_BASE;
+    var prefix = ASSET_BASE;
+    if (role === 'plywood') prefix += 'sklejka/';
+    else if (role === 'fur') prefix += 'futra/';
     return slugVariants(value).map(function(v){ return prefix + v; });
   }
 
@@ -260,12 +276,6 @@
       setHOption(entry.name, opt && opt.value !== undefined ? opt.value : opt);
     }
 
-    // baseUrls: tablica kandydujących URL-i BEZ rozszerzenia (patrz
-    // imgBasesFor/slugVariants), lub null gdy nie ma obrazka. Próbuje
-    // każdego wariantu × każdego rozszerzenia po kolei; dopiero gdy
-    // wszystkie kombinacje zawiodą, usuwa <img> i loguje szczegóły do
-    // missingImages. resolvedUrl trzyma pełny URL, który faktycznie
-    // się załadował — używany przez podgląd na hover.
     function makeSwatchItem(baseUrls, family, name, onClick){
       var item = document.createElement('div'); item.className = 'psw-item';
       var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'psw-swatch';

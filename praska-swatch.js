@@ -3,7 +3,7 @@
    loadera. Ten plik wklej w pole "JS" nowego modułu własnego. */
 
 (function(){
-  var css = "/* PRASKA — style dla próbek wariantów na nowym szablonie (Nooko) */\n.psw-root{ margin:1.5rem 0; font-family:'Source Sans 3',sans-serif; color:#3D3A35; }\n.psw-root .psw-group{ margin-bottom:1.8rem; }\n.psw-root .psw-label{ font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.8rem; display:flex; justify-content:space-between; gap:1rem; }\n.psw-root .psw-label b{ text-transform:none; letter-spacing:0; color:#6B7B5A; font-weight:600; }\n:where(.psw-req){ color:#B3453A; font-weight:600; }\n\n.psw-root .psw-tabs{ display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid #EAE5DC; width:max-content; max-width:100%; margin-bottom:1rem; }\n.psw-root .psw-tabs button{ flex:none; background:none; border:none; padding:.65rem 1.2rem; font-size:.85rem; font-family:inherit; cursor:pointer; opacity:.5; transition:all .25s ease; border-radius:0 !important; white-space:nowrap; }\n.psw-root .psw-tabs button.active{ background:#F5F0E8; opacity:1; }\n\n.psw-root .psw-row{ display:flex; gap:.8rem; flex-wrap:wrap; }\n.psw-root .psw-item{ display:flex; flex-direction:column; align-items:center; width:64px; }\n.psw-root .psw-swatch{\n  width:55px; height:55px; border:1px solid #EAE5DC; padding:0; cursor:pointer;\n  position:relative; border-radius:0 !important; overflow:hidden; transition:transform .2s ease;\n  background:#C9C2B4;\n}\n.psw-root .psw-swatch:hover{ transform:translateY(-2px); }\n.psw-root .psw-swatch.active{ outline:2px solid #3D3A35; outline-offset:2px; }\n.psw-root .psw-swatch img{ width:100%; height:100%; object-fit:cover; display:block; }\n.psw-root .psw-cap{ font-size:.62rem; text-align:center; margin-top:.35rem; color:#7A6552; line-height:1.15; }\n\n.psw-root .psw-chip{ background:none; border:1px solid #EAE5DC; padding:.6rem 1.2rem; font-size:.85rem; font-family:inherit; cursor:pointer; transition:all .25s ease; border-radius:0 !important; }\n.psw-root .psw-chip.active{ background:#6B7B5A; color:#F5F0E8; border-color:#6B7B5A; }\n\n.psw-root .psw-catalog{\n  display:inline-block; margin-top:1rem; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase;\n  color:#6B7B5A; text-decoration:none; border-bottom:1px solid #8A9A7B; padding-bottom:2px;\n}\n.psw-root .psw-catalog:hover{ color:#3D3A35; border-color:#3D3A35; }\n\n@media (hover:hover) and (pointer:fine){\n  #psw-preview{\n    position:fixed; z-index:9999; display:none; pointer-events:none;\n    background:#FDFBF7; border:1px solid #3D3A35; padding:1rem;\n    box-shadow:0 12px 28px -12px rgba(61,58,53,.35); align-items:center; gap:1rem; max-width:400px;\n  }\n  #psw-preview.show{ display:flex; }\n  #psw-preview .psw-preview-swatch{ width:125px; height:125px; flex:none; border:1px solid #EAE5DC; overflow:hidden; }\n  #psw-preview .psw-preview-swatch img{ width:100%; height:100%; object-fit:cover; }\n  #psw-preview .psw-preview-text{ font-size:.9rem; line-height:1.3; }\n  #psw-preview .psw-preview-family{ display:block; color:#6B7B5A; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.2rem; }\n}\n\n.psw-hidden-native{ position:absolute !important; width:1px !important; height:1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; white-space:nowrap !important; }\n\n.psw-group.psw-missing{ outline:2px solid #B3453A; outline-offset:6px; transition:outline-color .3s ease; }\n";
+  var css = "/* PRASKA — style dla próbek wariantów na nowym szablonie (Nooko) */\n.psw-root{ margin:1.5rem 0; font-family:'Source Sans 3',sans-serif; color:#3D3A35; }\n.psw-root .psw-group{ margin-bottom:1.8rem; }\n.psw-root .psw-label{ font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.8rem; display:flex; justify-content:space-between; gap:1rem; }\n.psw-root .psw-label b{ text-transform:none; letter-spacing:0; color:#6B7B5A; font-weight:600; }\n:where(.psw-req){ color:#B3453A; font-weight:600; }\n\n.psw-root .psw-tabs{ display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid #EAE5DC; width:max-content; max-width:100%; margin-bottom:1rem; }\n.psw-root .psw-tabs button{ flex:none; background:none; border:none; padding:.65rem 1.2rem; font-size:.85rem; font-family:inherit; cursor:pointer; opacity:.5; transition:all .25s ease; border-radius:0 !important; white-space:nowrap; }\n.psw-root .psw-tabs button.active{ background:#F5F0E8; opacity:1; }\n\n.psw-root .psw-row{ display:flex; gap:.8rem; flex-wrap:wrap; }\n.psw-root .psw-item{ display:flex; flex-direction:column; align-items:center; width:64px; }\n.psw-root .psw-swatch{\n  width:55px; height:55px; border:1px solid #EAE5DC; padding:0; cursor:pointer;\n  position:relative; border-radius:0 !important; overflow:hidden; transition:transform .2s ease;\n  background:#C9C2B4;\n}\n.psw-root .psw-swatch:hover{ transform:translateY(-2px); }\n.psw-root .psw-swatch.active{ outline:2px solid #3D3A35; outline-offset:2px; }\n.psw-root .psw-swatch img{ width:100%; height:100%; object-fit:cover; display:block; }\n.psw-root .psw-cap{ font-size:.62rem; text-align:center; margin-top:.35rem; color:#7A6552; line-height:1.15; }\n\n.psw-root .psw-chip{ background:none; border:1px solid #EAE5DC; padding:.6rem 1.2rem; font-size:.85rem; font-family:inherit; cursor:pointer; transition:all .25s ease; border-radius:0 !important; }\n.psw-root .psw-chip.active{ background:#6B7B5A; color:#F5F0E8; border-color:#6B7B5A; }\n\n.psw-root .psw-catalog{\n  display:inline-block; margin-top:1rem; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase;\n  color:#6B7B5A; text-decoration:none; border-bottom:1px solid #8A9A7B; padding-bottom:2px;\n}\n.psw-root .psw-catalog:hover{ color:#3D3A35; border-color:#3D3A35; }\n\n#psw-preview{\n  position:fixed; z-index:9999; display:none; pointer-events:none;\n  background:#FDFBF7; border:1px solid #3D3A35; padding:1rem;\n  box-shadow:0 12px 28px -12px rgba(61,58,53,.35); align-items:center; gap:1rem; max-width:min(400px, 92vw);\n}\n#psw-preview.show{ display:flex; }\n#psw-preview .psw-preview-swatch{ width:125px; height:125px; flex:none; border:1px solid #EAE5DC; overflow:hidden; }\n#psw-preview .psw-preview-swatch img{ width:100%; height:100%; object-fit:cover; }\n#psw-preview .psw-preview-text{ font-size:.9rem; line-height:1.3; }\n#psw-preview .psw-preview-family{ display:block; color:#6B7B5A; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.2rem; }\n#psw-preview.psw-preview--touch{\n  flex-direction:column; text-align:center;\n  top:50%; left:50%; right:auto; bottom:auto; transform:translate(-50%,-50%);\n  max-width:min(300px, 84vw);\n}\n#psw-preview.psw-preview--touch .psw-preview-swatch{ width:160px; height:160px; }\n\n.psw-hidden-native{ position:absolute !important; width:1px !important; height:1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; white-space:nowrap !important; }\n\n.psw-group.psw-missing{ outline:2px solid #B3453A; outline-offset:6px; transition:outline-color .3s ease; }\n";
   if (!document.getElementById('psw-module-style')){
     var st = document.createElement('style');
     st.id = 'psw-module-style';
@@ -19,6 +19,12 @@
   var ASSET_BASE = 'https://praska.shop/userdata/public/assets/warianty/';
 
   var IMG_EXTENSIONS = ['jpg', 'jpeg'];
+
+  // Long-press na mobile: ile ms przytrzymania uznajemy za "przytrzymanie"
+  // (nie zwykłe stuknięcie), i o ile px przesunięcie palca anuluje próbę
+  // (żeby nie kolidowało ze scrollowaniem strony).
+  var LONG_PRESS_MS = 450;
+  var TOUCH_MOVE_CANCEL_PX = 10;
 
   // ============================================================
   // MAPA option-id -> rola pola.
@@ -85,9 +91,6 @@
     '849': 'milky white 01'
   };
 
-  // Usuwa polskie znaki diakrytyczne NIEZALEŻNIE od wielkości liter
-  // (celowo bez wymuszania case'u tutaj — to robi slugVariants niżej,
-  // osobno dla wariantu małych i wielkich liter).
   function stripDiacritics(s){
     return String(s)
       .replace(/ą/g,'a').replace(/Ą/g,'A')
@@ -102,16 +105,6 @@
       .replace(/\s+/g,' ').trim();
   }
 
-  // ============================================================
-  // Repo assetów ma niespójne separatory ORAZ niespójną wielkość
-  // liter w nazwach plików. Próbujemy kolejno: myślnik/podkreślnik/
-  // spacja małymi literami (obecny standard, większość plików trafia
-  // tu za pierwszym-trzecim razem) -> te same trzy separatory
-  // WIELKIMI literami (rzadszy przypadek, świadomie na końcu — Peter
-  // zaakceptował dodatkowe zapytania sieciowe jako koszt tego
-  // podejścia). 6 wariantów nazwy x 2 rozszerzenia = do 12 prób,
-  // zanim zdjęcie zostanie uznane za brakujące.
-  // ============================================================
   function slugVariants(s){
     var stripped = stripDiacritics(s);
     var lower = stripped.toLowerCase();
@@ -123,10 +116,6 @@
     return variants;
   }
 
-  // Zwraca WSZYSTKIE kandydujące URL-e bazowe (bez rozszerzenia).
-  // Sklejka -> podfolder "sklejka/", futro -> podfolder "futra/"
-  // (Peter przeniósł tam wszystkie grafiki futra, analogicznie do
-  // sklejki), materiał -> bezpośrednio w ASSET_BASE.
   function imgBasesFor(role, value){
     var prefix = ASSET_BASE;
     if (role === 'plywood') prefix += 'sklejka/';
@@ -222,17 +211,30 @@
     document.body.appendChild(preview);
     return preview;
   }
-  function showPreview(x, y, url, family, name){
-    if (!supportsHover) return;
+  // touch=true -> wyśrodkowany podgląd (long-press na mobile), ignoruje x/y.
+  // touch=false/undefined -> dotychczasowe zachowanie, podgląd przy kursorze.
+  function showPreview(x, y, url, family, name, touch){
     var p = ensurePreview();
     p.querySelector('.psw-preview-swatch').innerHTML = url ? '<img src="'+url+'" alt="">' : '';
     p.querySelector('.psw-preview-family').textContent = family || '';
     p.querySelector('.psw-preview-name').textContent = name;
-    p.style.left = Math.min(x+16, window.innerWidth-420) + 'px';
-    p.style.top = Math.min(y+16, window.innerHeight-160) + 'px';
+    if (touch){
+      p.classList.add('psw-preview--touch');
+      p.style.left = '';
+      p.style.top = '';
+    } else {
+      p.classList.remove('psw-preview--touch');
+      p.style.left = Math.min(x+16, window.innerWidth-420) + 'px';
+      p.style.top = Math.min(y+16, window.innerHeight-160) + 'px';
+    }
     p.classList.add('show');
   }
-  function hidePreview(){ if (preview) preview.classList.remove('show'); }
+  function hidePreview(){
+    if (preview){
+      preview.classList.remove('show');
+      preview.classList.remove('psw-preview--touch');
+    }
+  }
 
   function init(){
     requiredChecks = [];
@@ -336,10 +338,63 @@
         tryNext();
         btn.appendChild(img);
       }
-      btn.addEventListener('mouseenter', function(e){ showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
-      btn.addEventListener('mousemove', function(e){ showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
+
+      // Hover myszą — bez zmian, tylko na urządzeniach z prawdziwym hover.
+      btn.addEventListener('mouseenter', function(e){ if (supportsHover) showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
+      btn.addEventListener('mousemove', function(e){ if (supportsHover) showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
       btn.addEventListener('mouseleave', hidePreview);
-      btn.addEventListener('click', onClick.bind(item));
+
+      // Long-press na dotyku — pokazuje wyśrodkowany podgląd po LONG_PRESS_MS
+      // przytrzymania bez ruchu; puszczenie chowa podgląd i NIE wybiera
+      // wariantu (suppressNextClick + preventDefault jako podwójne
+      // zabezpieczenie przed przypadkowym wyborem po samym oglądaniu).
+      // Zwykłe krótkie stuknięcie działa jak dotychczas przez 'click'.
+      var longPressTimer = null;
+      var touchStartX = 0, touchStartY = 0, longPressFired = false;
+      var suppressNextClick = false;
+
+      btn.addEventListener('touchstart', function(e){
+        if (!e.touches || e.touches.length !== 1) return;
+        longPressFired = false;
+        var touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        longPressTimer = setTimeout(function(){
+          longPressFired = true;
+          showPreview(touchStartX, touchStartY, resolvedUrl, family, name, true);
+        }, LONG_PRESS_MS);
+      }, { passive: true });
+
+      btn.addEventListener('touchmove', function(e){
+        if (!e.touches || e.touches.length !== 1) return;
+        var touch = e.touches[0];
+        if (Math.abs(touch.clientX - touchStartX) > TOUCH_MOVE_CANCEL_PX || Math.abs(touch.clientY - touchStartY) > TOUCH_MOVE_CANCEL_PX){
+          clearTimeout(longPressTimer);
+          if (longPressFired){ hidePreview(); longPressFired = false; }
+        }
+      }, { passive: true });
+
+      btn.addEventListener('touchend', function(e){
+        clearTimeout(longPressTimer);
+        if (longPressFired){
+          hidePreview();
+          suppressNextClick = true;
+          e.preventDefault();
+        }
+        longPressFired = false;
+      });
+
+      btn.addEventListener('touchcancel', function(){
+        clearTimeout(longPressTimer);
+        hidePreview();
+        longPressFired = false;
+      });
+
+      btn.addEventListener('click', function(e){
+        if (suppressNextClick){ suppressNextClick = false; e.preventDefault(); e.stopPropagation(); return; }
+        onClick.call(item, e);
+      });
+
       var cap = document.createElement('div'); cap.className = 'psw-cap'; cap.textContent = fullLabel;
       item.appendChild(btn); item.appendChild(cap);
       return item;

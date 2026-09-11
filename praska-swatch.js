@@ -3,7 +3,7 @@
    loadera. Ten plik wklej w pole "JS" nowego modułu własnego. */
 
 (function(){
-  var css = "/* PRASKA — style dla próbek wariantów na nowym szablonie (Nooko) */\n.psw-root{ margin:1.5rem 0; font-family:'Source Sans 3',sans-serif; color:#3D3A35; }\n.psw-root .psw-group{ margin-bottom:1.8rem; }\n.psw-root .psw-label{ font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.8rem; display:flex; justify-content:space-between; gap:1rem; }\n.psw-root .psw-label b{ text-transform:none; letter-spacing:0; color:#6B7B5A; font-weight:600; }\n:where(.psw-req){ color:#B3453A; font-weight:600; }\n\n.psw-root .psw-tabs{ display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid #EAE5DC; width:max-content; max-width:100%; margin-bottom:1rem; }\n.psw-root .psw-tabs button{ flex:none; background:none; border:none; padding:.65rem 1.2rem; font-size:.85rem; font-family:inherit; cursor:pointer; opacity:.5; transition:all .25s ease; border-radius:0 !important; white-space:nowrap; }\n.psw-root .psw-tabs button.active{ background:#F5F0E8; opacity:1; }\n\n.psw-root .psw-row{ display:flex; gap:.8rem; flex-wrap:wrap; }\n.psw-root .psw-item{ display:flex; flex-direction:column; align-items:center; width:64px; }\n.psw-root .psw-swatch{\n  width:55px; height:55px; border:1px solid #EAE5DC; padding:0; cursor:pointer;\n  position:relative; border-radius:0 !important; overflow:hidden; transition:transform .2s ease;\n  background:#C9C2B4;\n}\n.psw-root .psw-swatch:hover{ transform:translateY(-2px); }\n.psw-root .psw-swatch.active{ outline:2px solid #3D3A35; outline-offset:2px; }\n.psw-root .psw-swatch img{ width:100%; height:100%; object-fit:cover; display:block; }\n.psw-root .psw-cap{ font-size:.62rem; text-align:center; margin-top:.35rem; color:#7A6552; line-height:1.15; }\n\n.psw-root .psw-chip{ background:none; border:1px solid #EAE5DC; padding:.6rem 1.2rem; font-size:.85rem; font-family:inherit; cursor:pointer; transition:all .25s ease; border-radius:0 !important; }\n.psw-root .psw-chip.active{ background:#6B7B5A; color:#F5F0E8; border-color:#6B7B5A; }\n\n.psw-root .psw-catalog{\n  display:inline-block; margin-top:1rem; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase;\n  color:#6B7B5A; text-decoration:none; border-bottom:1px solid #8A9A7B; padding-bottom:2px;\n}\n.psw-root .psw-catalog:hover{ color:#3D3A35; border-color:#3D3A35; }\n\n#psw-preview{\n  position:fixed; z-index:9999; display:none; pointer-events:none;\n  background:#FDFBF7; border:1px solid #3D3A35; padding:1rem;\n  box-shadow:0 12px 28px -12px rgba(61,58,53,.35); align-items:center; gap:1rem; max-width:min(400px, 92vw);\n}\n#psw-preview.show{ display:flex; }\n#psw-preview .psw-preview-swatch{ width:125px; height:125px; flex:none; border:1px solid #EAE5DC; overflow:hidden; }\n#psw-preview .psw-preview-swatch img{ width:100%; height:100%; object-fit:cover; }\n#psw-preview .psw-preview-text{ font-size:.9rem; line-height:1.3; }\n#psw-preview .psw-preview-family{ display:block; color:#6B7B5A; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.2rem; }\n#psw-preview.psw-preview--touch{\n  flex-direction:column; text-align:center;\n  top:50%; left:50%; right:auto; bottom:auto; transform:translate(-50%,-50%);\n  max-width:min(300px, 84vw);\n}\n#psw-preview.psw-preview--touch .psw-preview-swatch{ width:160px; height:160px; }\n\n.psw-hidden-native{ position:absolute !important; width:1px !important; height:1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; white-space:nowrap !important; }\n\n.psw-group.psw-missing{ outline:2px solid #B3453A; outline-offset:6px; transition:outline-color .3s ease; }\n";
+  var css = "/* PRASKA — style dla próbek wariantów na nowym szablonie (Nooko) */\n.psw-root{ margin:1.5rem 0; font-family:'Source Sans 3',sans-serif; color:#3D3A35; }\n.psw-root .psw-group{ margin-bottom:1.8rem; }\n.psw-root .psw-label{ font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.8rem; display:flex; justify-content:space-between; gap:1rem; }\n.psw-root .psw-label b{ text-transform:none; letter-spacing:0; color:#6B7B5A; font-weight:600; }\n:where(.psw-req){ color:#B3453A; font-weight:600; }\n\n.psw-root .psw-tabs{ display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid #EAE5DC; width:max-content; max-width:100%; margin-bottom:1rem; }\n.psw-root .psw-tabs button{ flex:none; background:none; border:none; padding:.65rem 1.2rem; font-size:.85rem; font-family:inherit; cursor:pointer; opacity:.5; transition:all .25s ease; border-radius:0 !important; white-space:nowrap; }\n.psw-root .psw-tabs button.active{ background:#F5F0E8; opacity:1; }\n\n.psw-root .psw-row{ display:flex; gap:.8rem; flex-wrap:wrap; }\n.psw-root .psw-item{ display:flex; flex-direction:column; align-items:center; width:64px; }\n.psw-root .psw-swatch{\n  width:55px; height:55px; border:1px solid #EAE5DC; padding:0; cursor:pointer;\n  position:relative; border-radius:0 !important; overflow:hidden; transition:transform .2s ease;\n  background:#C9C2B4;\n}\n.psw-root .psw-swatch:hover{ transform:translateY(-2px); }\n.psw-root .psw-swatch.active{ outline:2px solid #3D3A35; outline-offset:2px; }\n.psw-root .psw-swatch img{ width:100%; height:100%; object-fit:cover; display:block; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }\n.psw-root .psw-cap{ font-size:.62rem; text-align:center; margin-top:.35rem; color:#7A6552; line-height:1.15; }\n\n.psw-root .psw-chip{ background:none; border:1px solid #EAE5DC; padding:.6rem 1.2rem; font-size:.85rem; font-family:inherit; cursor:pointer; transition:all .25s ease; border-radius:0 !important; }\n.psw-root .psw-chip.active{ background:#6B7B5A; color:#F5F0E8; border-color:#6B7B5A; }\n\n.psw-root .psw-catalog{\n  display:inline-block; margin-top:1rem; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase;\n  color:#6B7B5A; text-decoration:none; border-bottom:1px solid #8A9A7B; padding-bottom:2px;\n}\n.psw-root .psw-catalog:hover{ color:#3D3A35; border-color:#3D3A35; }\n\n#psw-preview{\n  position:fixed; z-index:9999; display:none; pointer-events:none;\n  background:#FDFBF7; border:1px solid #3D3A35; padding:1rem;\n  box-shadow:0 12px 28px -12px rgba(61,58,53,.35); align-items:center; gap:1rem; max-width:min(400px, 92vw);\n}\n#psw-preview.show{ display:flex; }\n#psw-preview .psw-preview-swatch{ width:125px; height:125px; flex:none; border:1px solid #EAE5DC; overflow:hidden; }\n#psw-preview .psw-preview-swatch img{ width:100%; height:100%; object-fit:cover; }\n#psw-preview .psw-preview-text{ font-size:.9rem; line-height:1.3; }\n#psw-preview .psw-preview-family{ display:block; color:#6B7B5A; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; margin-bottom:.2rem; }\n#psw-preview.psw-preview--touch{\n  flex-direction:column; text-align:center; pointer-events:auto; cursor:pointer;\n  top:50%; left:50%; right:auto; bottom:auto; transform:translate(-50%,-50%);\n  max-width:min(300px, 84vw);\n}\n#psw-preview.psw-preview--touch .psw-preview-swatch{ width:160px; height:160px; }\n\n.psw-hidden-native{ position:absolute !important; width:1px !important; height:1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; white-space:nowrap !important; }\n\n.psw-group.psw-missing{ outline:2px solid #B3453A; outline-offset:6px; transition:outline-color .3s ease; }\n";
   if (!document.getElementById('psw-module-style')){
     var st = document.createElement('style');
     st.id = 'psw-module-style';
@@ -20,42 +20,6 @@
 
   var IMG_EXTENSIONS = ['jpg', 'jpeg'];
 
-  // Long-press na mobile: ile ms przytrzymania uznajemy za "przytrzymanie"
-  // (nie zwykłe stuknięcie), i o ile px przesunięcie palca anuluje próbę
-  // (żeby nie kolidowało ze scrollowaniem strony).
-  var LONG_PRESS_MS = 450;
-  var TOUCH_MOVE_CANCEL_PX = 10;
-
-  // ============================================================
-  // MAPA option-id -> rola pola.
-  //
-  // Potwierdzone na żywo (DE/FR/PL/EN): 143, 135, 162, 57, 107.
-  // Potwierdzone z tabeli tłumaczeń "A. Labels": 109 (ALOVA), 64
-  // (ROZMIAR/SIZE/GRÖSSE), 124 (ŚREDNICA/DIAMETER), 131 (Wymiary/
-  // DIMENSIONS), 165 (DŁUGOŚĆ MOSTKA/BRIDGE LENGTH), 149 (Strona
-  // lewa lub prawa/LEFT OR RIGHT SIDE).
-  //
-  // Pola futra — pięć różnych option-id, wszystkie role:'fur', BEZ
-  // klucza "family" (Peter: pokazuj surową przetłumaczoną etykietę
-  // pola, nie stałe słowo):
-  //   123 KOLOR FUTRA / FUR COLOR          — Grupa 21 (MATERIAŁ, admin)
-  //   141 FUTRO SZEROKIE PASY / FUR WIDE STRIPES — Grupa 21 (MATERIAŁ, admin)
-  //   142 FUTRO / FUR                       — Grupa 32
-  //   152 FUTRO / FUR                       — Grupa 35 (SKLEJKA+FUTRO,
-  //       tylko admin-side grupowanie; sama opcja to zwykłe pole futra,
-  //       bez specjalnej struktury łączonej)
-  //   166 FUTRO FLUFFY / FLUFFY FUR         — Grupa 36
-  // "Grupa" to wewnętrzna kategoria Shopera do organizacji opcji w
-  // panelu admina — nie wpływa na to, jak pole renderuje się na
-  // froncie, więc nie ma odzwierciedlenia w kodzie.
-  //
-  // NIE zmapowane celowo — brak istniejącej "role" dla nich, czekają
-  // na decyzję/próbkę:
-  //   63  POCHYLNIA / RAMP
-  //   75  KOLOR WEWNĄTRZ / INNER COLOR
-  //   172 WZÓR / PATTERN — UWAGA: to INNY option-id niż 135
-  //       "Materiał PATTERN", nie mylić.
-  // ============================================================
   var OPTION_ID_MAP = {
     '143': { role: 'plywood' },
     '135': { role: 'material', family: 'PATTERN' },
@@ -203,16 +167,18 @@
 
   var supportsHover = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
   var preview;
+  var currentPreviewBtn = null;
   function ensurePreview(){
     if (preview) return preview;
     preview = document.createElement('div');
     preview.id = 'psw-preview';
     preview.innerHTML = '<div class="psw-preview-swatch"></div><div class="psw-preview-text"><b class="psw-preview-family"></b><span class="psw-preview-name"></span></div>';
+    preview.addEventListener('click', function(){
+      if (preview.classList.contains('psw-preview--touch')) hidePreview();
+    });
     document.body.appendChild(preview);
     return preview;
   }
-  // touch=true -> wyśrodkowany podgląd (long-press na mobile), ignoruje x/y.
-  // touch=false/undefined -> dotychczasowe zachowanie, podgląd przy kursorze.
   function showPreview(x, y, url, family, name, touch){
     var p = ensurePreview();
     p.querySelector('.psw-preview-swatch').innerHTML = url ? '<img src="'+url+'" alt="">' : '';
@@ -234,6 +200,7 @@
       preview.classList.remove('show');
       preview.classList.remove('psw-preview--touch');
     }
+    currentPreviewBtn = null;
   }
 
   function init(){
@@ -311,6 +278,13 @@
       setHOption(entry.name, opt && opt.value !== undefined ? opt.value : opt);
     }
 
+    // Klik na próbce: zawsze wybiera wariant (bez zmian względem
+    // dotychczasowego zachowania). Na urządzeniach dotykowych DODATKOWO
+    // pokazuje/chowa duży podgląd: pierwszy tap na danej próbce ją
+    // otwiera, tap na TĘ SAMĄ (już otwartą) próbkę chowa, tap na INNĄ
+    // próbkę przełącza podgląd na nią (bez wymogu zamykania najpierw).
+    // Tap w sam duży podgląd też go chowa. Na desktop (supportsHover)
+    // podgląd nadal działa wyłącznie przez hover myszą, bez zmian.
     function makeSwatchItem(baseUrls, family, name, onClick){
       var item = document.createElement('div'); item.className = 'psw-item';
       var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'psw-swatch';
@@ -339,60 +313,20 @@
         btn.appendChild(img);
       }
 
-      // Hover myszą — bez zmian, tylko na urządzeniach z prawdziwym hover.
       btn.addEventListener('mouseenter', function(e){ if (supportsHover) showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
       btn.addEventListener('mousemove', function(e){ if (supportsHover) showPreview(e.clientX, e.clientY, resolvedUrl, family, name); });
       btn.addEventListener('mouseleave', hidePreview);
 
-      // Long-press na dotyku — pokazuje wyśrodkowany podgląd po LONG_PRESS_MS
-      // przytrzymania bez ruchu; puszczenie chowa podgląd i NIE wybiera
-      // wariantu (suppressNextClick + preventDefault jako podwójne
-      // zabezpieczenie przed przypadkowym wyborem po samym oglądaniu).
-      // Zwykłe krótkie stuknięcie działa jak dotychczas przez 'click'.
-      var longPressTimer = null;
-      var touchStartX = 0, touchStartY = 0, longPressFired = false;
-      var suppressNextClick = false;
-
-      btn.addEventListener('touchstart', function(e){
-        if (!e.touches || e.touches.length !== 1) return;
-        longPressFired = false;
-        var touch = e.touches[0];
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-        longPressTimer = setTimeout(function(){
-          longPressFired = true;
-          showPreview(touchStartX, touchStartY, resolvedUrl, family, name, true);
-        }, LONG_PRESS_MS);
-      }, { passive: true });
-
-      btn.addEventListener('touchmove', function(e){
-        if (!e.touches || e.touches.length !== 1) return;
-        var touch = e.touches[0];
-        if (Math.abs(touch.clientX - touchStartX) > TOUCH_MOVE_CANCEL_PX || Math.abs(touch.clientY - touchStartY) > TOUCH_MOVE_CANCEL_PX){
-          clearTimeout(longPressTimer);
-          if (longPressFired){ hidePreview(); longPressFired = false; }
-        }
-      }, { passive: true });
-
-      btn.addEventListener('touchend', function(e){
-        clearTimeout(longPressTimer);
-        if (longPressFired){
-          hidePreview();
-          suppressNextClick = true;
-          e.preventDefault();
-        }
-        longPressFired = false;
-      });
-
-      btn.addEventListener('touchcancel', function(){
-        clearTimeout(longPressTimer);
-        hidePreview();
-        longPressFired = false;
-      });
-
       btn.addEventListener('click', function(e){
-        if (suppressNextClick){ suppressNextClick = false; e.preventDefault(); e.stopPropagation(); return; }
         onClick.call(item, e);
+        if (!supportsHover){
+          if (currentPreviewBtn === btn){
+            hidePreview();
+          } else {
+            currentPreviewBtn = btn;
+            showPreview(0, 0, resolvedUrl, family, name, true);
+          }
+        }
       });
 
       var cap = document.createElement('div'); cap.className = 'psw-cap'; cap.textContent = fullLabel;
